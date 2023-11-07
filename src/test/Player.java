@@ -23,7 +23,6 @@ public class Player {
 
 	public void update() {
 		updatePosition();
-		updateJump();
 	}
 
 	float velocityY;
@@ -31,12 +30,18 @@ public class Player {
 	float jumpHeight = 2 * 50;
 	float jumpStrength = 6.5f;
 
-	private void updateJump() {
+	private void updatePosition() {
+		if (movingLeft) {
+			x -= jumping ? 3.5f : 2.5f;
+		}
+		if (movingRight) {
+			x += jumping ? 3.5f : 2.5f;
+		}
 		if (jumping) {
 			if (velocityY == 0)
 				velocityY = jumpStrength;
 			velocityY -= gravity;
-			y += -(velocityY);
+			y -= (velocityY);
 			if (y >= 350 || velocityY <= -jumpStrength) {
 				y = 350;
 				jumping = false;
@@ -45,15 +50,19 @@ public class Player {
 			System.out.println(Math.abs(y - 350) + " : " + velocityY);
 		}
 
-		hitbox.y = y;
-	}
-
-	private void updatePosition() {
-		if (movingLeft) {
-			x -= 2.5f;
-		}
-		if (movingRight) {
-			x += 2.5f;
+		// test
+		falling = x > GamePanel.WIDHT;
+		if (falling) {
+			if (velocityY > 0)
+				velocityY = 0;
+			System.out.println("falling");
+			velocityY -= gravity;
+			y -= (velocityY);
+			if (y >= GamePanel.HEIGHT - 50) {
+				falling = false;
+				velocityY = 0;
+				y = GamePanel.HEIGHT - 50;
+			}
 		}
 		hitbox.x = x;
 		hitbox.y = y;

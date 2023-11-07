@@ -5,7 +5,7 @@ import java.awt.event.KeyListener;
 
 public class MovingController implements KeyListener {
 	public Game game;
-	public boolean leftPressed, rightPressed;
+	public boolean leftPressed, rightPressed, spacePressed;
 
 	public MovingController(Game game) {
 		this.game = game;
@@ -24,8 +24,9 @@ public class MovingController implements KeyListener {
 			game.player.movingLeft = false;
 		}
 		case KeyEvent.VK_SPACE -> {
-			if (game.player.jumping == false)
+			if (game.player.jumping == false && spacePressed == false)
 				game.player.jumping = true;
+			spacePressed = true;
 		}
 		}
 	}
@@ -43,6 +44,7 @@ public class MovingController implements KeyListener {
 			game.player.movingLeft = leftPressed;
 		}
 		case KeyEvent.VK_SPACE -> {
+			spacePressed = false;
 			if (game.player.jumping == true && game.player.velocityY >= 0)
 				game.player.velocityY = -0.0001f;
 		}
