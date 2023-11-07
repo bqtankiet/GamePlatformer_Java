@@ -24,6 +24,8 @@ public class MovingController implements KeyListener {
 			game.player.movingLeft = false;
 		}
 		case KeyEvent.VK_SPACE -> {
+			if (game.player.jumping == false)
+				game.player.jumping = true;
 		}
 		}
 	}
@@ -39,6 +41,10 @@ public class MovingController implements KeyListener {
 		case KeyEvent.VK_RIGHT -> {
 			game.player.movingRight = rightPressed = false;
 			game.player.movingLeft = leftPressed;
+		}
+		case KeyEvent.VK_SPACE -> {
+			if (game.player.jumping == true && game.player.velocityY >= 0)
+				game.player.velocityY = -0.0001f;
 		}
 		}
 	}
