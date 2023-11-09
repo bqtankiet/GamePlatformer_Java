@@ -18,10 +18,12 @@ public class Map {
 		ArrayList<Rectangle> solidList = new ArrayList<>();
 		Rectangle surface = new Rectangle(0, 400, GamePanel.WIDHT, GamePanel.HEIGHT - 400);
 		Rectangle block = new Rectangle(GamePanel.WIDHT - 200, 350, 200, 50);
-		Rectangle block1 = new Rectangle(00, 300, 300, 100);
+		Rectangle block1 = new Rectangle(00, 300, 300, 50);
+		Rectangle block2 = new Rectangle(500, 250, 200, 50);
 		solidList.add(surface);
 		solidList.add(block);
 		solidList.add(block1);
+		solidList.add(block2);
 		return new Map(solidList);
 	}
 

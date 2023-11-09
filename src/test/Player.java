@@ -38,11 +38,11 @@ public class Player {
 	private void updatePosition() {
 		// move left
 		if (movingLeft) {
-			velocityX = jumping ? -3.0f : -2.5f;
+			velocityX = jumping ? -3.5f : -2.5f;
 		}
 		// move right
 		if (movingRight) {
-			velocityX = jumping ? 3.0f : 2.5f;
+			velocityX = jumping ? 3.5f : 2.5f;
 		}
 		// jumping
 		if (jumping) {
@@ -62,8 +62,9 @@ public class Player {
 		if (falling) {
 			if (velocityY > 0)
 				velocityY = 0;
-			velocityY += -gravity * 1.123;
+			velocityY += -gravity * 1.2;
 		}
+		// update after have velocity
 		hitbox.x = x += velocityX;
 		hitbox.y = y -= (velocityY);
 		velocityX = 0;
@@ -71,11 +72,13 @@ public class Player {
 
 	private boolean stadingOnFloor() {
 		for (Rectangle solid : map.solidList) {
-			Rectangle.Float rect = new Rectangle.Float(hitbox.x, hitbox.y, hitbox.width, hitbox.height + 1);
-			if (rect.intersects(solid)) {
+			hitbox.y += 0.1f;
+			if (hitbox.intersects(solid)) {
+				hitbox.y -= 0.1f;
 				return true;
 			}
 		}
+		hitbox.y -= 0.1f;
 		return false;
 	}
 
@@ -83,16 +86,19 @@ public class Player {
 		for (Rectangle solid : map.solidList) {
 			if (hitbox.intersects(solid)) {
 				Rectangle2D rect = hitbox.createIntersection(solid);
-				if (falling && hitbox.y + hitbox.height-10 < solid.y) {
+				if (falling && hitbox.y + hitbox.height - 10 < solid.y) {
 					hitbox.y = y -= (float) rect.getHeight();
 					velocityY = 0;
 					falling = false;
+				} else if (jumping && hitbox.y > solid.y+solid.height - 10) {
+					hitbox.y = y += (float) rect.getHeight();
+					velocityY = 0;
+					falling = true;
+					jumping = false;
 				} else if (movingRight) {
 					hitbox.x = x -= (float) rect.getWidth();
-					break;
 				} else if (movingLeft) {
 					hitbox.x = x += (float) rect.getWidth();
-					break;
 				}
 			}
 		}
