@@ -2,6 +2,7 @@ package test;
 
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
 
 public class Player {
 	// position properties
@@ -10,10 +11,16 @@ public class Player {
 
 	// movement properties
 	public boolean movingLeft, movingRight, jumping, falling;
+	public float velocityY, velocityX;
+	public float gravity = 0.2f;
+	public float jumpHeight = 2 * 50;
+	public float jumpStrength = 6.5f;
+	public Map map;
 
 	public Player() {
 		this.x = 400;
 		this.y = 350;
+//		this.size = 50;
 		this.hitbox = new Rectangle.Float(x, y, 50, 50);
 	}
 
@@ -23,24 +30,21 @@ public class Player {
 
 	public void update() {
 		updatePosition();
+		updateCollision();
+		System.out.println("x: " + hitbox.x);
+		System.out.println("y: " + hitbox.y);
 	}
 
-	float velocityY;
-	float gravity = 0.2f;
-	float jumpHeight = 2 * 50;
-	float jumpStrength = 6.5f;
-
 	private void updatePosition() {
+		// move left
 		if (movingLeft) {
-			hitbox.x = x -= jumping ? 3.5f : 2.5f;
-			collisionX();
+			velocityX = jumping ? -3.0f : -2.5f;
 		}
-
+		// move right
 		if (movingRight) {
-			hitbox.x = x += jumping ? 3.5f : 2.5f;
-			collisionX();
+			velocityX = jumping ? 3.0f : 2.5f;
 		}
-
+		// jumping
 		if (jumping) {
 			if (velocityY == 0)
 				velocityY = jumpStrength;
@@ -50,84 +54,66 @@ public class Player {
 				jumping = false;
 				falling = true;
 			}
-			hitbox.y = y -= velocityY;
-			if (collisionY()) {
-				velocityY = 0;
-				jumping = false;
-				falling = true;
-			}
 		}
-		if (!standingOnSolid() && !jumping && !falling) {
+		// falling
+		if (!stadingOnFloor() && !jumping && !falling) {
 			falling = true;
 		}
 		if (falling) {
 			if (velocityY > 0)
 				velocityY = 0;
-			velocityY -= gravity * 1.2;
-			hitbox.y = y -= (velocityY);
-			if (standingOnSolid()) {
-				collisionY();
-				velocityY = 0;
-				falling = false;
-			}
+			velocityY += -gravity * 1.123;
 		}
+		hitbox.x = x += velocityX;
+		hitbox.y = y -= (velocityY);
+		velocityX = 0;
 	}
 
-	private boolean standingOnSolid() {
-		hitbox.y += 0.1;
+	private boolean stadingOnFloor() {
 		for (Rectangle solid : map.solidList) {
-			if (hitbox.intersects(solid)) {
-				hitbox.y -= 0.1;
-				return true;
-			}
-		}
-		hitbox.y -= 0.1;
-		return false;
-	}
-
-	public Map map;
-
-	public boolean collisionX() {
-		for (Rectangle solid : map.solidList) {
-			if (hitbox.intersects(solid)) {
-				System.out.println("collison x");
-				float dxIntersect = 0f;
-				// intersect right side
-				if (hitbox.x <= solid.x) {
-					dxIntersect = Math.abs(solid.x - (hitbox.x + hitbox.width));
-					hitbox.x = x -= dxIntersect;
-					break;
-				}
-				// intersect left side
-				if (hitbox.x >= solid.x) {
-					dxIntersect = Math.abs((solid.x + solid.width) - hitbox.x);
-					hitbox.x = x += dxIntersect;
-					break;
-				}
+			Rectangle.Float rect = new Rectangle.Float(hitbox.x, hitbox.y, hitbox.width, hitbox.height + 1);
+			if (rect.intersects(solid)) {
 				return true;
 			}
 		}
 		return false;
+	}
+
+	private void updateCollision() {
+		for (Rectangle solid : map.solidList) {
+			if (hitbox.intersects(solid)) {
+				Rectangle2D rect = hitbox.createIntersection(solid);
+				if (falling && hitbox.y + hitbox.height-10 < solid.y) {
+					hitbox.y = y -= (float) rect.getHeight();
+					velocityY = 0;
+					falling = false;
+				} else if (movingRight) {
+					hitbox.x = x -= (float) rect.getWidth();
+					break;
+				} else if (movingLeft) {
+					hitbox.x = x += (float) rect.getWidth();
+					break;
+				}
+			}
+		}
 	}
 
 	public boolean collisionY() {
 		for (Rectangle solid : map.solidList) {
 			if (hitbox.intersects(solid)) {
-				System.out.println("collision y");
 				float dyIntersect = 0f;
 				// intersect top
 				if (hitbox.y >= solid.y) {
 					dyIntersect = Math.abs((solid.y + solid.height) - hitbox.y);
 					hitbox.y = y += dyIntersect;
-					break;
+					return true;
 				}
 				// intersect bottom
 				if (hitbox.y <= solid.y) {
 					dyIntersect = Math.abs(solid.y - (hitbox.y + hitbox.height));
 					hitbox.y = y -= dyIntersect;
-					break;
+					return true;
 				}
-				return true;
 			}
 		}
 		return false;
