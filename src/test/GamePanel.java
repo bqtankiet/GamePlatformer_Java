@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -41,8 +42,7 @@ public class GamePanel extends JPanel {
 		Graphics2D g2d = (Graphics2D) g;
 		game.player.draw(g2d);
 		g2d.setColor(Color.WHITE);
-		g2d.fillRect(0, 400, WIDHT, HEIGHT-400);
+		game.map.draw(g2d);
 	}
-	
-	
+
 }
