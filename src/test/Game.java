@@ -4,9 +4,12 @@ public class Game {
 
 	public GamePanel panel;
 	public Player player;
+	public Map map;
 
 	public Game() {
 		this.player = new Player();
+		this.map = Map.getSimpleMap();
+		this.player.map = map;
 		this.panel = new GamePanel(this);
 		startGameLoop();
 	}
@@ -37,7 +40,7 @@ public class Game {
 				}
 
 				if (System.nanoTime() - fpsTimer >= 1_000_000_000) {
-					System.out.println("FPS: " + frames);
+//					System.out.println("FPS: " + frames);
 					frames = 0;
 					fpsTimer = System.nanoTime();
 				}

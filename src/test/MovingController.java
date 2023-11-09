@@ -24,9 +24,10 @@ public class MovingController implements KeyListener {
 			game.player.movingLeft = false;
 		}
 		case KeyEvent.VK_SPACE -> {
-			if (game.player.jumping == false && spacePressed == false)
-				game.player.jumping = true;
-			spacePressed = true;
+			if (!game.player.falling && !spacePressed) {
+				game.player.jumping = spacePressed = true;
+				game.player.falling = false;
+			}
 		}
 		}
 	}
@@ -44,9 +45,8 @@ public class MovingController implements KeyListener {
 			game.player.movingLeft = leftPressed;
 		}
 		case KeyEvent.VK_SPACE -> {
-			spacePressed = false;
-			if (game.player.jumping == true && game.player.velocityY >= 0)
-				game.player.velocityY = -0.0001f;
+			game.player.jumping = spacePressed = false;
+			game.player.falling = true;
 		}
 		}
 	}
