@@ -32,11 +32,13 @@ public class Player {
 
 	private void updatePosition() {
 		if (movingLeft) {
-			x -= jumping ? 3.5f : 2.5f;
+			hitbox.x = x -= jumping ? 3.5f : 2.5f;
+			collisionX();
 		}
 
 		if (movingRight) {
-			x += jumping ? 3.5f : 2.5f;
+			hitbox.x = x += jumping ? 3.5f : 2.5f;
+			collisionX();
 		}
 
 		if (jumping) {
@@ -48,27 +50,86 @@ public class Player {
 				jumping = false;
 				falling = true;
 			}
-			y -= velocityY;
-//			if (y >= 350) { // is touching surface
-//				y = 350;
-//				jumping = false;
-//				velocityY = 0;
-//			}
+			hitbox.y = y -= velocityY;
+			if (collisionY()) {
+				velocityY = 0;
+				jumping = false;
+				falling = true;
+			}
 		}
-
+		if (!standingOnSolid() && !jumping && !falling) {
+			falling = true;
+		}
 		if (falling) {
 			if (velocityY > 0)
 				velocityY = 0;
-			velocityY -= gravity;
-			y -= (velocityY);
-//			if (y >= 350) { // is touching surface
-//				velocityY = 0;
-//				y = 350;
-//				falling = false;
-//			}
+			velocityY -= gravity * 1.2;
+			hitbox.y = y -= (velocityY);
+			if (standingOnSolid()) {
+				collisionY();
+				velocityY = 0;
+				falling = false;
+			}
 		}
-		hitbox.x = x;
-		hitbox.y = y;
 	}
 
+	private boolean standingOnSolid() {
+		hitbox.y += 0.1;
+		for (Rectangle solid : map.solidList) {
+			if (hitbox.intersects(solid)) {
+				hitbox.y -= 0.1;
+				return true;
+			}
+		}
+		hitbox.y -= 0.1;
+		return false;
+	}
+
+	public Map map;
+
+	public boolean collisionX() {
+		for (Rectangle solid : map.solidList) {
+			if (hitbox.intersects(solid)) {
+				System.out.println("collison x");
+				float dxIntersect = 0f;
+				// intersect right side
+				if (hitbox.x <= solid.x) {
+					dxIntersect = Math.abs(solid.x - (hitbox.x + hitbox.width));
+					hitbox.x = x -= dxIntersect;
+					break;
+				}
+				// intersect left side
+				if (hitbox.x >= solid.x) {
+					dxIntersect = Math.abs((solid.x + solid.width) - hitbox.x);
+					hitbox.x = x += dxIntersect;
+					break;
+				}
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean collisionY() {
+		for (Rectangle solid : map.solidList) {
+			if (hitbox.intersects(solid)) {
+				System.out.println("collision y");
+				float dyIntersect = 0f;
+				// intersect top
+				if (hitbox.y >= solid.y) {
+					dyIntersect = Math.abs((solid.y + solid.height) - hitbox.y);
+					hitbox.y = y += dyIntersect;
+					break;
+				}
+				// intersect bottom
+				if (hitbox.y <= solid.y) {
+					dyIntersect = Math.abs(solid.y - (hitbox.y + hitbox.height));
+					hitbox.y = y -= dyIntersect;
+					break;
+				}
+				return true;
+			}
+		}
+		return false;
+	}
 }

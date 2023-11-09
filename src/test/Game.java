@@ -16,16 +16,15 @@ public class Game {
 	}
 
 	private void update() {
+		player.map = map;
 		this.player.update();
 		// Test intersect with surface
-		for (Rectangle solid : map.solidList) {
-			if (player.hitbox.intersects(solid)) {
-				float dyIntersect = Math.abs(solid.y - (player.hitbox.y + player.hitbox.height));
-				player.hitbox.y = player.y -= dyIntersect;
-				player.velocityY = 0;
-				player.falling = false;
-			} 
-		}
+//			if (player.hitbox.intersects(solid)) {
+//				float dyIntersect = Math.abs(solid.y - (player.hitbox.y + player.hitbox.height));
+//				player.hitbox.y = player.y -= dyIntersect;
+//				player.velocityY = 0;
+//				player.falling = false;
+//			} 
 	}
 
 	public void startGameLoop() {
