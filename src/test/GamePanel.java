@@ -16,7 +16,7 @@ public class GamePanel extends JPanel {
 	public Game game;
 	public MovingController controller;
 	public Image doubleBufferImage;
-	public Graphics doubleBufferGraphics;
+	public Graphics2D doubleBufferG2D;
 
 	public GamePanel(Game game) {
 		this.game = game;
@@ -28,25 +28,25 @@ public class GamePanel extends JPanel {
 		showUp();
 	}
 
-	public void showUp() 
+	public void showUp()
 	// show the panel on the frame
 	{
 		JFrame frame = new JFrame("Simple");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().add(this);
-		// Set the JFrame to fullscreen
+		// Set the JFrame to full screen
 		frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		frame.setUndecorated(true);
 		frame.setVisible(true);
-	}// end of showUp()
+	}// close showUp()
 
 	@Override
-	public void addNotify() 
+	public void addNotify()
 	// wait for panel to be added to the JFrame
 	{
 		super.addNotify();
 		startGameLoop();
-	}// end of addNotify()
+	}// close addNotify()
 
 	public void startGameLoop()
 	// initialize and start the game thread
@@ -66,43 +66,43 @@ public class GamePanel extends JPanel {
 
 				if (delta >= 1) {
 					delta--;
+					frames++;
 					game.update();
 					gameRender();
 					paintScreen();
-					frames++;
 				}
 
 				if (System.nanoTime() - fpsTimer >= 1_000_000_000) {
-//					System.out.println("FPS: " + frames);
+					System.out.println("FPS: " + frames);
 					frames = 0;
 					fpsTimer = System.nanoTime();
 				}
 			}
 		}).start();
-	}// end of startGameLoop()
+	}// close startGameLoop()
 
 	private void gameRender()
 	// draw the current frame to an image buffer
 	{
 		if (doubleBufferImage == null) { // create the buffer
-			doubleBufferImage = createImage(WIDTH,HEIGHT);
+			doubleBufferImage = createImage(WIDTH, HEIGHT);
+			if (doubleBufferImage == null) { // after create if it still null -> return
+				System.out.println("doubleBufferImage is null");
+				return;
+			} else
+				doubleBufferG2D = (Graphics2D) doubleBufferImage.getGraphics();
 		}
-		if (doubleBufferImage == null) { // after create if it still null -> return
-			System.out.println("doubleBufferImage is null");
-			return;
-		} else {
-			doubleBufferGraphics = doubleBufferImage.getGraphics();
-			doubleBufferGraphics.setColor(Color.lightGray);
-			doubleBufferGraphics.fillRect(0, 0, 1366, 768);
-			// draw game elements
-			Graphics2D g2d = (Graphics2D) doubleBufferGraphics;
-			game.player.draw(g2d);
-			game.map.draw(g2d);
-			if(showGrid) {
-				game.map.drawGrid(g2d);
-			}
+		// clear back ground
+		doubleBufferG2D.setColor(Color.lightGray);
+		doubleBufferG2D.fillRect(0, 0, GamePanel.WIDTH, GamePanel.HEIGHT);
+		// draw game elements
+		game.player.draw(doubleBufferG2D);
+		game.map.draw(doubleBufferG2D);
+		if (showGrid) {
+			game.map.drawGrid(doubleBufferG2D);
 		}
-	}// end of gameRender()
+	}// close gameRender()
+
 	public boolean showGrid = false;
 
 	private void paintScreen()
@@ -111,13 +111,14 @@ public class GamePanel extends JPanel {
 		Graphics g;
 		try {
 			g = this.getGraphics(); // get the panel's graphic context
-			if ((g != null) && (doubleBufferImage != null))
+			if ((g != null) && (doubleBufferImage != null)) {
 				g.drawImage(doubleBufferImage, 0, 0, null);
+			}
 			Toolkit.getDefaultToolkit().sync(); // sync the display on some systems
 			g.dispose();
 		} catch (Exception e) {
-			System.out.println("Graphics context error: " + e);
+			System.out.println("GamePanel graphics context error: " + e);
 		}
-	} // end of paintScreen()
+	} // close paintScreen()
 
 }

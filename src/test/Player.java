@@ -30,10 +30,7 @@ public class Player {
 
 	public void update() {
 		updatePosition();
-		updateCollision();
-//		System.out.println("x: " + hitbox.x);
-//		System.out.println("y: " + hitbox.y);
-//		System.out.println("vY " + velocityY);
+		CollisionHandler.handleCollision(this, map);
 	}
 
 	private void updatePosition() {
@@ -62,7 +59,7 @@ public class Player {
 			}
 		}
 		// falling
-		if (!stadingOnFloor() && !jumping && !falling) {
+		if (!CollisionHandler.stadingOnFloor(this, map) && !jumping && !falling) {
 			falling = true;
 		}
 		if (falling) {
@@ -74,17 +71,17 @@ public class Player {
 		hitbox.y = y -= (velocityY);
 	}
 
-	private boolean stadingOnFloor() {
-		for (Rectangle solid : map.solidList) {
-			hitbox.y += 0.1f;
-			if (hitbox.intersects(solid)) {
-				hitbox.y -= 0.1f;
-				return true;
-			}
-		}
-		hitbox.y -= 0.1f;
-		return false;
-	}
+//	private boolean stadingOnFloor() {
+//		for (Rectangle solid : map.solidList) {
+//			hitbox.y += 0.1f;
+//			if (hitbox.intersects(solid)) {
+//				hitbox.y -= 0.1f;
+//				return true;
+//			}
+//		}
+//		hitbox.y -= 0.1f;
+//		return false;
+//	}
 
 //	private void updateCollision() {
 //		for (Rectangle solid : map.solidList) {
@@ -119,63 +116,63 @@ public class Player {
 //		}
 //	}
 	
-	private void updateCollision() {
-	    for (Rectangle solid : map.solidList) {
-	        if (hitbox.intersects(solid)) {
-	            handleCollision(solid);
-	        }
-	    }
-	}
-
-	private void handleCollision(Rectangle solid) {
-	    Rectangle2D intersectRect = hitbox.createIntersection(solid);
-	    float dx = (float) intersectRect.getWidth();
-	    float dy = (float) intersectRect.getHeight();
-	    boolean isFallingCollision = falling && dy <= 10 && hitbox.y < solid.y;
-	    boolean isJumpingCollision = jumping && dy <= 10 && hitbox.y > solid.y;
-	    boolean isRightCollision = movingRight && dx != hitbox.width;
-	    boolean isLeftCollision = movingLeft && dx != hitbox.width;
-
-	    if (isFallingCollision) {
-	        handleFallingCollision(dy);
-	        dx = 0f;
-	    }
-
-	    if (isJumpingCollision) {
-	        handleJumpingCollision(dy);
-	        dx = 0f;
-	    }
-
-	    if (isRightCollision) {
-	        handleRightCollision(dx);
-	    }
-
-	    if (isLeftCollision) {
-	        handleLeftCollision(dx);
-	    }
-	}
-
-	private void handleFallingCollision(float dy) {
-	    velocityY = 0;
-	    falling = false;
-	    hitbox.y = y -= dy;
-	}
-
-	private void handleJumpingCollision(float dy) {
-	    velocityY = 0;
-	    falling = true;
-	    jumping = false;
-	    hitbox.y = y += dy;
-	}
-
-	private void handleRightCollision(float dx) {
-	    velocityX = 0;
-	    hitbox.x = x -= dx;
-	}
-
-	private void handleLeftCollision(float dx) {
-	    velocityX = 0;
-	    hitbox.x = x += dx;
-	}
+//	private void updateCollision() {
+//	    for (Rectangle solid : map.solidList) {
+//	        if (hitbox.intersects(solid)) {
+//	            handleCollision(solid);
+//	        }
+//	    }
+//	}
+//
+//	private void handleCollision(Rectangle solid) {
+//	    Rectangle2D intersectRect = hitbox.createIntersection(solid);
+//	    float dx = (float) intersectRect.getWidth();
+//	    float dy = (float) intersectRect.getHeight();
+//	    boolean isFallingCollision = falling && dy <= 10 && hitbox.y < solid.y;
+//	    boolean isJumpingCollision = jumping && dy <= 10 && hitbox.y > solid.y;
+//	    boolean isRightCollision = movingRight && dx != hitbox.width;
+//	    boolean isLeftCollision = movingLeft && dx != hitbox.width;
+//
+//	    if (isFallingCollision) {
+//	        handleFallingCollision(dy);
+//	        dx = 0f;
+//	    }
+//
+//	    if (isJumpingCollision) {
+//	        handleJumpingCollision(dy);
+//	        dx = 0f;
+//	    }
+//
+//	    if (isRightCollision) {
+//	        handleRightCollision(dx);
+//	    }
+//
+//	    if (isLeftCollision) {
+//	        handleLeftCollision(dx);
+//	    }
+//	}
+//
+//	private void handleFallingCollision(float dy) {
+//	    velocityY = 0;
+//	    falling = false;
+//	    hitbox.y = y -= dy;
+//	}
+//
+//	private void handleJumpingCollision(float dy) {
+//	    velocityY = 0;
+//	    falling = true;
+//	    jumping = false;
+//	    hitbox.y = y += dy;
+//	}
+//
+//	private void handleRightCollision(float dx) {
+//	    velocityX = 0;
+//	    hitbox.x = x -= dx;
+//	}
+//
+//	private void handleLeftCollision(float dx) {
+//	    velocityX = 0;
+//	    hitbox.x = x += dx;
+//	}
 
 }
