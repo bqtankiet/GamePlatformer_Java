@@ -1,42 +1,48 @@
 package test;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
-import test.Map;
 
 public class Player {
 	// position properties
 	public Rectangle.Float hitbox;
 	public float x, y;
 
-	// movement properties
+	// movement state
 	public boolean movingLeft, movingRight, jumping, falling;
 	public float velocityY, velocityX;
 	public float gravity = 0.2f;
-	public float jumpHeight = 2 * 50;
-	public float jumpStrength = 6.5f;
+	public float jumpStrength = 7f;
 	public Map map;
 
 	public Player() {
 		this.x = 400;
 		this.y = 350;
-//		this.size = 50;
 		this.hitbox = new Rectangle.Float(x, y, 50, 50);
 	}
 
 	public void draw(Graphics2D g2d) {
+		g2d.setColor(Color.DARK_GRAY);
 		g2d.fill(hitbox);
 	}
 
 	public void update() {
 		updatePosition();
 		updateCollision();
-		System.out.println("x: " + hitbox.x);
-		System.out.println("y: " + hitbox.y);
+//		System.out.println("x: " + hitbox.x);
+//		System.out.println("y: " + hitbox.y);
+//		System.out.println("vY " + velocityY);
 	}
 
 	private void updatePosition() {
+		if (!movingLeft && !movingRight) {
+			velocityX = 0;
+		}
+		if (!jumping && !falling) {
+			velocityY = 0;
+		}
 		// move left
 		if (movingLeft) {
 			velocityX = jumping ? -3.5f : -2.5f;
@@ -51,7 +57,6 @@ public class Player {
 				velocityY = jumpStrength;
 			velocityY -= gravity;
 			if (velocityY <= 0) {
-				velocityY = 0;
 				jumping = false;
 				falling = true;
 			}
@@ -61,14 +66,12 @@ public class Player {
 			falling = true;
 		}
 		if (falling) {
-			if (velocityY > 0)
-				velocityY = 0;
+			if(velocityY > 0) velocityY = 0;
 			velocityY += -gravity * 1.2;
 		}
 		// update after have velocity
 		hitbox.x = x += velocityX;
 		hitbox.y = y -= (velocityY);
-		velocityX = 0;
 	}
 
 	private boolean stadingOnFloor() {
@@ -83,46 +86,96 @@ public class Player {
 		return false;
 	}
 
+//	private void updateCollision() {
+//		for (Rectangle solid : map.solidList) {
+//			boolean collisionDetected = hitbox.intersects(solid);
+//
+//			if (collisionDetected) {
+//				Rectangle2D intersectRect = hitbox.createIntersection(solid);
+//				float dx = (float) intersectRect.getWidth();
+//				float dy = (float) intersectRect.getHeight();
+//				if (falling && dy <= 10 && hitbox.y < solid.y) {
+//					velocityY = 0;
+//					falling = false;
+//					dx = 0f;
+//					hitbox.y = y -= dy;
+//				}
+//				if (jumping && dy <= 10 && hitbox.y > solid.y) {
+//					velocityY = 0;
+//					falling = true;
+//					jumping = false;
+//					dx = 0f;
+//					hitbox.y = y += dy;
+//				}
+//				if (movingRight && dx != hitbox.width) {
+//					velocityX = 0;
+//					hitbox.x = x -= dx;
+//				}
+//				if (movingLeft && dx != hitbox.width) {
+//					velocityX = 0;
+//					hitbox.x = x += dx;
+//				}
+//			}
+//		}
+//	}
+	
 	private void updateCollision() {
-		for (Rectangle solid : map.solidList) {
-			if (hitbox.intersects(solid)) {
-				Rectangle2D rect = hitbox.createIntersection(solid);
-				if (falling && hitbox.y + hitbox.height - 10 < solid.y) {
-					hitbox.y = y -= (float) rect.getHeight();
-					velocityY = 0;
-					falling = false;
-				} else if (jumping && hitbox.y > solid.y+solid.height - 10) {
-					hitbox.y = y += (float) rect.getHeight();
-					velocityY = 0;
-					falling = true;
-					jumping = false;
-				} else if (movingRight) {
-					hitbox.x = x -= (float) rect.getWidth();
-				} else if (movingLeft) {
-					hitbox.x = x += (float) rect.getWidth();
-				}
-			}
-		}
+	    for (Rectangle solid : map.solidList) {
+	        if (hitbox.intersects(solid)) {
+	            handleCollision(solid);
+	        }
+	    }
 	}
 
-	public boolean collisionY() {
-		for (Rectangle solid : map.solidList) {
-			if (hitbox.intersects(solid)) {
-				float dyIntersect = 0f;
-				// intersect top
-				if (hitbox.y >= solid.y) {
-					dyIntersect = Math.abs((solid.y + solid.height) - hitbox.y);
-					hitbox.y = y += dyIntersect;
-					return true;
-				}
-				// intersect bottom
-				if (hitbox.y <= solid.y) {
-					dyIntersect = Math.abs(solid.y - (hitbox.y + hitbox.height));
-					hitbox.y = y -= dyIntersect;
-					return true;
-				}
-			}
-		}
-		return false;
+	private void handleCollision(Rectangle solid) {
+	    Rectangle2D intersectRect = hitbox.createIntersection(solid);
+	    float dx = (float) intersectRect.getWidth();
+	    float dy = (float) intersectRect.getHeight();
+	    boolean isFallingCollision = falling && dy <= 10 && hitbox.y < solid.y;
+	    boolean isJumpingCollision = jumping && dy <= 10 && hitbox.y > solid.y;
+	    boolean isRightCollision = movingRight && dx != hitbox.width;
+	    boolean isLeftCollision = movingLeft && dx != hitbox.width;
+
+	    if (isFallingCollision) {
+	        handleFallingCollision(dy);
+	        dx = 0f;
+	    }
+
+	    if (isJumpingCollision) {
+	        handleJumpingCollision(dy);
+	        dx = 0f;
+	    }
+
+	    if (isRightCollision) {
+	        handleRightCollision(dx);
+	    }
+
+	    if (isLeftCollision) {
+	        handleLeftCollision(dx);
+	    }
 	}
+
+	private void handleFallingCollision(float dy) {
+	    velocityY = 0;
+	    falling = false;
+	    hitbox.y = y -= dy;
+	}
+
+	private void handleJumpingCollision(float dy) {
+	    velocityY = 0;
+	    falling = true;
+	    jumping = false;
+	    hitbox.y = y += dy;
+	}
+
+	private void handleRightCollision(float dx) {
+	    velocityX = 0;
+	    hitbox.x = x -= dx;
+	}
+
+	private void handleLeftCollision(float dx) {
+	    velocityX = 0;
+	    hitbox.x = x += dx;
+	}
+
 }
