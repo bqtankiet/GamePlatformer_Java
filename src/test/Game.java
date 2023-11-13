@@ -8,7 +8,8 @@ public class Game {
 
 	public Game() {
 		this.player = new Player();
-		this.map = Map.getSimpleMap();
+		this.map = new Map();
+		this.map.getSimpleMap();
 		this.player.map = map;
 		this.panel = new GamePanel(this);
 	}

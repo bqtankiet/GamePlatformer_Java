@@ -31,6 +31,8 @@ public class OtherController implements KeyListener {
 				System.exit(0);
 			}
 		}
+		case KeyEvent.VK_ENTER -> {
+		}
 		}
 	}
 

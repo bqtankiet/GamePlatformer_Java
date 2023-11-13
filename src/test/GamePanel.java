@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -15,12 +16,12 @@ public class GamePanel extends JPanel {
 	public static final int HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;
 	public Game game;
 	public MovingController controller;
-	public Image doubleBufferImage;
-	public Graphics2D doubleBufferG2D;
+	public Image gameBufferImage, screenBufferImage;
+	public Graphics2D gameBufferG2D;
+	public Graphics screenBufferGraphics;
 
 	public GamePanel(Game game) {
 		this.game = game;
-		setBackground(Color.GRAY);
 		addKeyListener(controller = new MovingController(game));
 		addKeyListener(new OtherController(game));
 		setFocusable(true);
@@ -84,23 +85,20 @@ public class GamePanel extends JPanel {
 	private void gameRender()
 	// draw the current frame to an image buffer
 	{
-		if (doubleBufferImage == null) { // create the buffer
-			doubleBufferImage = createImage(WIDTH, HEIGHT);
-			if (doubleBufferImage == null) { // after create if it still null -> return
+		if (gameBufferImage == null) { // create the buffer
+			gameBufferImage = createImage(game.map.getWidth(), HEIGHT);
+			if (gameBufferImage == null) { // after create if it still null -> return
 				System.out.println("doubleBufferImage is null");
 				return;
 			} else
-				doubleBufferG2D = (Graphics2D) doubleBufferImage.getGraphics();
+				gameBufferG2D = (Graphics2D) gameBufferImage.getGraphics();
 		}
 		// clear back ground
-		doubleBufferG2D.setColor(Color.lightGray);
-		doubleBufferG2D.fillRect(0, 0, GamePanel.WIDTH, GamePanel.HEIGHT);
+		gameBufferG2D.setColor(Color.lightGray);
+		gameBufferG2D.fillRect(0, 0, game.map.getWidth(), GamePanel.HEIGHT);
 		// draw game elements
-		game.player.draw(doubleBufferG2D);
-		game.map.draw(doubleBufferG2D);
-		if (showGrid) {
-			game.map.drawGrid(doubleBufferG2D);
-		}
+		game.player.draw(gameBufferG2D);
+		game.map.draw(gameBufferG2D);
 	}// close gameRender()
 
 	public boolean showGrid = false;
@@ -110,15 +108,45 @@ public class GamePanel extends JPanel {
 	{
 		Graphics g;
 		try {
-			g = this.getGraphics(); // get the panel's graphic context
-			if ((g != null) && (doubleBufferImage != null)) {
-				g.drawImage(doubleBufferImage, 0, 0, null);
+			g = this.getGraphics();
+			if ((g != null) && (gameBufferImage != null)) {
+				if (screenBufferImage == null) { // using screenBufferImage to make slide scroll
+					screenBufferImage = createImage(WIDTH, HEIGHT);
+					screenBufferGraphics = screenBufferImage.getGraphics();
+				}
+				screenBufferGraphics.setColor(Color.WHITE);
+				screenBufferGraphics.fillRect(0, 0, WIDTH, HEIGHT);
+				int cameraX = (int) ((game.player.hitbox.x - WIDTH / 2));
+//				if (cameraX <= 0) {
+//					cameraX = 0;
+//				}
+//				if(cameraX + WIDTH >= game.map.getWidth()) {
+//					cameraX = game.map.getWidth() - WIDTH;
+//				}
+				screenBufferGraphics.drawImage(gameBufferImage, -cameraX, 0, null);
+				if (showGrid) {
+					drawGrid(screenBufferGraphics);
+				}
+				g.drawImage(screenBufferImage, 0, 0, null);
+//				g2d.drawImage(dbScrImg,0, 0, null);
 			}
-			Toolkit.getDefaultToolkit().sync(); // sync the display on some systems
 			g.dispose();
 		} catch (Exception e) {
 			System.out.println("GamePanel graphics context error: " + e);
 		}
 	} // close paintScreen()
+
+	public void drawGrid(Graphics g) {
+		for (int r = 0; r <= GamePanel.HEIGHT / Map.TITLE_SIZE; r++) {
+			for (int c = 0; c <= GamePanel.WIDTH / Map.TITLE_SIZE; c++) {
+				g.setColor(Color.RED);
+				int x = c * Map.TITLE_SIZE;
+				int y = r * Map.TITLE_SIZE;
+				g.drawRect(x, y, Map.TITLE_SIZE, Map.TITLE_SIZE);
+				g.drawString("r" + r + "c" + c, x, y + 10);
+			}
+		}
+
+	}
 
 }

@@ -29,7 +29,7 @@ public class CollisionHandler {
 		Rectangle2D intersectRect = player.hitbox.createIntersection(solid);
 		float dx = (float) intersectRect.getWidth();
 		float dy = (float) intersectRect.getHeight();
-		boolean isFallingCollision = player.falling && dy <= 10 && player.hitbox.y < solid.y;
+		boolean isFallingCollision = player.falling && dy <= 15 && player.hitbox.y < solid.y;
 		boolean isJumpingCollision = player.jumping && dy <= 10 && player.hitbox.y > solid.y;
 		boolean isRightCollision = player.movingRight && dx != player.hitbox.width;
 		boolean isLeftCollision = player.movingLeft && dx != player.hitbox.width;
