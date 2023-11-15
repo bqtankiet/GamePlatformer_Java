@@ -1,15 +1,17 @@
 package test;
 
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public class Map {
 
 	public static final int TITLE_SIZE = 50;
 	public ArrayList<Rectangle> solidList;
-	public int cols = 35;
+	public int cols = 40;
 
 	public Map(ArrayList<Rectangle> solidList) {
 		this.solidList = solidList;
@@ -29,7 +31,7 @@ public class Map {
 		solidList.add(top);
 		solidList.add(left);
 		solidList.add(right);
-		solidList.add(block);
+//		solidList.add(block);
 		this.solidList = solidList;
 	}
 	
@@ -50,10 +52,33 @@ public class Map {
 		this.solidList = solidList;
 	}
 
+	BufferedImage background = new BufferedImage(getWidth(), 766, BufferedImage.TYPE_INT_ARGB);
+	Graphics backgroundG2D = background.getGraphics();
+	
+	int i = 0;
 	public void draw(Graphics2D g2d) {
-		g2d.setColor(Color.WHITE);
+		if (i == 0) {
+		backgroundG2D.drawImage(ImageManager.backgroundLayer1, TITLE_SIZE, 4*TITLE_SIZE,360*2+50,180*2+50, null);
+		backgroundG2D.drawImage(ImageManager.backgroundLayer1, TITLE_SIZE+(360*2+50), 4*TITLE_SIZE,360*2+50,180*2+50, null);
+		backgroundG2D.drawImage(ImageManager.backgroundLayer1, TITLE_SIZE+(360*2+50)*2, 4*TITLE_SIZE,360*2+50,180*2+50, null);
+//		backgroundG2D.drawImage(ImageManager.backgroundLayer2, TITLE_SIZE, 4*TITLE_SIZE,360*2+50,180*2+50, null);
+//		backgroundG2D.drawImage(ImageManager.backgroundLayer2, TITLE_SIZE+(360*2+50), 4*TITLE_SIZE,360*2+50,180*2+50, null);
+//		backgroundG2D.drawImage(ImageManager.backgroundLayer2, TITLE_SIZE+(360*2+50)*2, 4*TITLE_SIZE,360*2+50,180*2+50, null);
+		backgroundG2D.drawImage(ImageManager.backgroundLayer3, TITLE_SIZE, 4*TITLE_SIZE,360*2+50,180*2+50, null);
+		backgroundG2D.drawImage(ImageManager.backgroundLayer3, TITLE_SIZE+(360*2+50), 4*TITLE_SIZE,360*2+50,180*2+50, null);
+		backgroundG2D.drawImage(ImageManager.backgroundLayer3, TITLE_SIZE+(360*2+50)*2, 4*TITLE_SIZE,360*2+50,180*2+50, null);
+		i = 1;
+		}
+		g2d.drawImage(background,0,0,null);
+		g2d.drawImage(ImageManager.shop, 10*TITLE_SIZE, 8*TITLE_SIZE,200,200,null);
+		g2d.drawImage(ImageManager.lamp, 15*TITLE_SIZE, 10*TITLE_SIZE-15,ImageManager.lamp.getWidth()*2,ImageManager.lamp.getHeight()*2,null);
+		g2d.drawImage(ImageManager.fence_1, 20*TITLE_SIZE, 11*TITLE_SIZE+12,ImageManager.fence_1.getWidth()*2,ImageManager.fence_1.getHeight()*2,null);
+		g2d.setColor(new Color(37,22,19));
 		for (Rectangle solid : solidList) {
 			g2d.fill(solid);
+		}
+		for (int i = 0; i < cols; i++) {
+			g2d.drawImage(ImageManager.grassTile, i * TITLE_SIZE, 12*TITLE_SIZE, TITLE_SIZE, TITLE_SIZE, null);
 		}
 	}
 

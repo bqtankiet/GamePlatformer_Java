@@ -6,11 +6,16 @@ import java.awt.geom.Rectangle2D;
 public class CollisionHandler {
 
 	public static void handleCollision(Player player, Map map) {
+		player.hitbox.x = player.x + player.size/3;
+		player.hitbox.y = player.y + (player.size - player.hitbox.height);
 		for (Rectangle solid : map.solidList) {
 			if (player.hitbox.intersects(solid)) {
 				handleCollision(player, solid);
 			}
 		}
+		player.hitbox.x = player.x + player.size/3;
+		player.hitbox.y = player.y + (player.size - player.hitbox.height);
+
 	}
 
 	public static boolean stadingOnFloor(Player player, Map map) {
