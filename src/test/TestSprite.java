@@ -17,6 +17,8 @@ public class TestSprite {
 			@Override
 			protected void paintComponent(Graphics g) {
 				super.paintComponent(g);
+//				g.drawImage(currentSprite, 0,0,150,150,null);
+				ImageManager.flipHorizontal(currentSprite);
 				g.drawImage(currentSprite, 0,0,150,150,null);
 				g.drawRect(50, 100, 40, 50);
 			}

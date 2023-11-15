@@ -1,5 +1,6 @@
 package test;
 
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +14,7 @@ public class ImageManager {
 	public static BufferedImage idleSprite;
 	public static BufferedImage runSprite;
 	public static BufferedImage jumpSprite;
+	public static BufferedImage fallSprite;
 	// background
 	public static BufferedImage backgroundLayer3;
 	public static BufferedImage backgroundLayer2;
@@ -54,6 +56,7 @@ public class ImageManager {
 		idleSprite = sprite.getSubimage(0, 0, SIZE * 6, SIZE);
 		runSprite = sprite.getSubimage(0, SIZE * 2, SIZE * 8, SIZE);
 		jumpSprite = sprite.getSubimage(0, SIZE * 3, SIZE * 8, SIZE);
+		fallSprite = sprite.getSubimage(0, SIZE * 4, SIZE * 8, SIZE);
 	}
 
 	private static void loadBackgroundImg() throws IOException {
@@ -64,6 +67,13 @@ public class ImageManager {
 
 	public static BufferedImage getIdleSprite(int i) {
 		return idleSprite.getSubimage(i * SIZE, 0, SIZE, SIZE);
+	}
+
+	public static BufferedImage flipHorizontal(BufferedImage image) {
+		BufferedImage result = new BufferedImage(SIZE, SIZE, BufferedImage.TYPE_INT_ARGB);
+		Graphics2D g2d = (Graphics2D) result.getGraphics();
+		g2d.drawImage(image, 0+(image.getWidth()), 0, -image.getWidth(), image.getHeight(), null);
+		return result;
 	}
 
 	public static BufferedImage getRunSprite(int i) {

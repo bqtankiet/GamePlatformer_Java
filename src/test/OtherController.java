@@ -27,11 +27,15 @@ public class OtherController implements KeyListener {
 		}
 		case KeyEvent.VK_ESCAPE -> {
 			int option = JOptionPane.showConfirmDialog(null, "Exit");
-			if(option == JOptionPane.YES_OPTION) {
+			if (option == JOptionPane.YES_OPTION) {
 				System.exit(0);
 			}
 		}
 		case KeyEvent.VK_ENTER -> {
+		}
+		case KeyEvent.VK_O -> {
+			game.player.imageOn = !game.player.imageOn;
+			game.map.imageOn = !game.map.imageOn;
 		}
 		}
 	}

@@ -18,7 +18,9 @@ public class Player {
 	public float jumpStrength = 8f;
 	// other properties
 	public Map map;
-	public BufferedImage currentAnimation;
+	public int numOfSprite;
+	public BufferedImage image = null;
+	public boolean imageOn = false;
 
 	public Player() {
 		this.x = GamePanel.WIDTH / 2;
@@ -30,11 +32,9 @@ public class Player {
 	public void draw(Graphics2D g2d) {
 		g2d.setColor(Color.RED);
 //		BufferedImage image = currentAnimation.getSubimage(currentIndex * 56, 0, 56, 56);
-		BufferedImage image = ImageManager.getSpriteAt(currentIndex, currentAnimation);
-		if (movingLeft) {
-			g2d.drawImage(image, Math.round(x) + 140, Math.round(y), -size, size, null);
-		} else
+		if (imageOn) {
 			g2d.drawImage(image, Math.round(x), Math.round(y), size, size, null);
+		}
 		g2d.draw(hitbox);
 	}
 
@@ -45,27 +45,36 @@ public class Player {
 	}
 
 	int frames = 0;
-	int delay = 10;
+	int delay = 15;
 	int currentIndex = 0;
 
 	private void updateAnimation() {
-		if (jumping) {
-			currentAnimation = ImageManager.jumpSprite;
-		} else if (movingLeft) {
-			currentAnimation = ImageManager.runSprite;
-		} else if (movingRight) {
-			currentAnimation = ImageManager.runSprite;
+		// update animation index
+		if (movingLeft || movingRight) {
+			numOfSprite = 8;
 		} else {
-			currentAnimation = ImageManager.idleSprite;
+			numOfSprite = 6;
 		}
 		frames++;
-		if (currentIndex >= currentAnimation.getWidth() / 56 - 1) {
+		if (currentIndex >= numOfSprite - 1) {
 			currentIndex = 0;
 		}
 		if (frames >= delay) {
 			frames = 0;
 			currentIndex++;
 		}
+		// update animation image base on animation index
+		if (jumping) {
+			image = ImageManager.getSpriteAt(6, ImageManager.jumpSprite);
+		} else if (falling) {
+			image = ImageManager.getSpriteAt(1, ImageManager.fallSprite);
+		} else if (movingLeft || movingRight) {
+			image = ImageManager.getSpriteAt(currentIndex, ImageManager.runSprite);
+		} else {
+			image = ImageManager.getSpriteAt(currentIndex, ImageManager.idleSprite);
+		}
+		if (movingLeft)
+			image = ImageManager.flipHorizontal(image);
 	}
 
 	private void updatePosition() {
