@@ -65,14 +65,10 @@ public class ImageManager {
 		backgroundLayer1 = ImageIO.read(ImageManager.class.getResourceAsStream("/background/background_layer_1.png"));
 	}
 
-	public static BufferedImage getIdleSprite(int i) {
-		return idleSprite.getSubimage(i * SIZE, 0, SIZE, SIZE);
-	}
-
 	public static BufferedImage flipHorizontal(BufferedImage image) {
 		BufferedImage result = new BufferedImage(SIZE, SIZE, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g2d = (Graphics2D) result.getGraphics();
-		g2d.drawImage(image, 0+(image.getWidth()), 0, -image.getWidth(), image.getHeight(), null);
+		g2d.drawImage(image, image.getWidth(), 0, -image.getWidth(), image.getHeight(), null);
 		return result;
 	}
 

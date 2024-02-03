@@ -34,8 +34,8 @@ public class Player {
 //		BufferedImage image = currentAnimation.getSubimage(currentIndex * 56, 0, 56, 56);
 		if (imageOn) {
 			g2d.drawImage(image, Math.round(x), Math.round(y), size, size, null);
-		}
-		g2d.draw(hitbox);
+		} else
+			g2d.draw(hitbox);
 	}
 
 	public void update() {

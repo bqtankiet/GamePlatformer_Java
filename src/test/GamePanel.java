@@ -15,7 +15,6 @@ public class GamePanel extends JPanel {
 	public static final int WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width;
 	public static final int HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;
 	public Game game;
-	public MovingController controller;
 	public Image gameBufferImage, screenBufferImage;
 	public Graphics2D gameBufferG2D;
 	public Graphics2D screenBufferGraphics;
@@ -23,10 +22,10 @@ public class GamePanel extends JPanel {
 	public GamePanel(Game game) {
 		this.game = game;
 		setBackground(new Color(37,22,19));
-		addKeyListener(controller = new MovingController(game));
+		addKeyListener(new MovingController(game));
 		addKeyListener(new OtherController(game));
 		setFocusable(true);
-		requestFocus();
+		requestFocusInWindow();
 		showUp();
 	}
 
@@ -154,8 +153,8 @@ public class GamePanel extends JPanel {
 		if (showGrid) {
 			drawGrid(gameBufferG2D);
 		}
-		int cameraX = (int) ((game.player.hitbox.x - WIDTH / 2));
 		// draw game
+		int cameraX = (int) ((game.player.hitbox.x - WIDTH / 2));
 		g.drawImage(gameBufferImage, -cameraX, 0, null);
 	}
 
