@@ -12,7 +12,7 @@ public class Map {
 	public static final int TITLE_SIZE = 50;
 	public ArrayList<Rectangle> solidList;
 	public int cols = 40;
-	public boolean imageOn = false;
+	public boolean imageOn = true;
 
 	public Map(ArrayList<Rectangle> solidList) {
 		this.solidList = solidList;

@@ -20,7 +20,7 @@ public class Player {
 	public Map map;
 	public int numOfSprite;
 	public BufferedImage image = null;
-	public boolean imageOn = false;
+	public boolean imageOn = true;
 
 	public Player() {
 		this.x = GamePanel.WIDTH / 2;
